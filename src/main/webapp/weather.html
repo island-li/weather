@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<style>
+tr td{
+	width:150px;
+}
+
+</style>
+<script src="js/jquery-3.2.1.min.js"></script>
+</head>
+<body>
+	<h1>weather page</h1>
+	<select id="chooser" style="width: 200px; height: 25px;margin-bottom:10px;" onchange="cityChange(this);">
+		<option value="">select one</option>
+		<option value="Sydney">Sydney</option>
+		<option value="Melbourne">Melbourne</option>
+		<option value="Wollongong">Wollongong</option>
+		<option value="Beijing">Beijing</option>
+		<option value="Changsha">Changsha</option>
+		<option value="Newyork">New York</option>
+	</select>
+	<table id="cityWeather" border="1" cellspacing="0" style="display:none;"></table>
+</body>
+<script>
+	function cityChange(obj) {
+		var cityName = $(obj).val();
+		var url = "/weather/australian/city?cityName=" + cityName
+		if(cityName){
+			$.ajax({url:url,success:function(data){
+				if(data != 'error'){
+					var weatherInfo = JSON.parse(data).weatherinfo;
+					var html = [];
+					html.push('<tr><td>City</td><td>'+cityName+'</td></tr>');
+					html.push('<tr><td>Updated time</td><td>'+getCurrTime()+'</td></tr>');
+					html.push('<tr><td>Weather</td><td>'+weatherInfo.weather+'</td></tr>');
+					html.push('<tr><td>Temperature</td><td>'+weatherInfo.temp1+"-"+weatherInfo.temp2+'</td></tr>');
+					$("#cityWeather").html(html.join(''));
+					$("#cityWeather").show();
+				}else{
+					alert("获取数据失败");
+					$("#cityWeather").hide();
+				}
+			}});
+		}else{
+			$("#cityWeather").html('');
+		}
+	}
+	function getCurrTime(){
+		var date = new Date();
+		var day = date.toString().substr(0,4);
+		var hours = date.getHours();
+		var min = date.getMinutes();
+		var dn;
+		if(hours > 12 && hours < 24){
+			dn = 'PM';
+		}else{
+			dn = 'AM';
+		}
+		if(hours < 10){
+			hours = "0" + hours;
+		}
+		if(min < 10){
+			min = "0" + min;
+		}
+		return day + " " + hours + ":" + min + " " + dn;
+	}	   
+</script>
+</html>
